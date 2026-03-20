@@ -1,0 +1,33 @@
+name: Reusable Build and Test
+
+on:
+  workflow_call:
+    inputs:
+      python_version:
+        required: true
+        type: string
+      run_tests:
+        type: boolean
+        default: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - run: pip install -r requirements.txt
+
+      - name: Start app
+        run: |
+          python app/app.py &
+          sleep 5
+
+      - name: Run tests
+        if: ${{ inputs.run_tests }}
+        run: pytest
