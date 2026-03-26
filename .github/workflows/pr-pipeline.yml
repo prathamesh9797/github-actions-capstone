@@ -1,0 +1,33 @@
+name: PR Pipeline
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Dependencies for Vulnerabilities
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
+
+  build-test:
+    uses: ./.github/workflows/reusable-build-test.yml
+    with:
+      python_version: "3.11"
+
+  pr-comment:
+    needs: [dependency-review, build-test]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "PR checks passed for ${{ github.head_ref }}"

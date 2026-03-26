@@ -26,4 +26,5 @@ jobs:
     environment: production
 
     steps:
-      - run: 'echo "Deploying image: ${{ needs.docker.outputs.image_url }}"'
+      - name: Deploy
+        run: echo "Deploying image to production "

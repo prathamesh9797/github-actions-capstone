@@ -1,4 +1,4 @@
-name: Docker Build
+name: Reusable Docker Build
 
 on:
   workflow_call:
@@ -14,19 +14,45 @@ on:
         required: true
       docker_token:
         required: true
+    outputs:
+      image_url:
+        description: "Full Docker image path"
+        value: ${{ jobs.docker.outputs.image }}
 
 jobs:
   docker:
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.set.outputs.image }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Login to Docker Hub
         run: echo "${{ secrets.docker_token }}" | docker login -u "${{ secrets.docker_username }}" --password-stdin
 
-      - name: Build and Push
+      - name: Build Docker Image
         run: |
-          IMAGE=${{ inputs.image_name }}:${{ inputs.tag }}
+          IMAGE=${{ secrets.docker_username }}/${{ inputs.image_name }}:${{ inputs.tag }}
+          echo "Building $IMAGE"
           docker build -t $IMAGE .
+
+      - name: Scan Docker Image for Vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.docker_username }}/${{ inputs.image_name }}:${{ inputs.tag }}
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+      - name: Push Docker Image
+        run: |
+          IMAGE=${{ secrets.docker_username }}/${{ inputs.image_name }}:${{ inputs.tag }}
           docker push $IMAGE
+
+      - name: Set output image URL
+        id: set
+        run: |
+          IMAGE=${{ secrets.docker_username }}/${{ inputs.image_name }}:${{ inputs.tag }}
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
