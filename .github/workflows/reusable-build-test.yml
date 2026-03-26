@@ -26,23 +26,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Start app
-        run: |
-          nohup python app/app.py > app.log 2>&1 &
-          
-          echo "Waiting for app to start..."
-          for i in {1..15}; do
-            if curl -s http://localhost:5000/health; then
-              echo "App is ready!"
-              break
-            fi
-            echo "Retry $i..."
-            sleep 2
-          done
-
-          echo "==== APP LOGS ===="
-          cat app.log
-
       - name: Run tests
         if: ${{ inputs.run_tests }}
+        env:
+          PYTHONPATH: .
         run: pytest
