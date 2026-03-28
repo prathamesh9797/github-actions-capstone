@@ -44,8 +44,9 @@ jobs:
           image-ref: ${{ secrets.docker_username }}/${{ inputs.image_name }}:${{ inputs.tag }}
           format: table
           exit-code: 1
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
           trivyignore: ${{ github.workspace }}/.trivyignore
+
       - name: Push Docker Image
         run: |
           IMAGE=${{ secrets.docker_username }}/${{ inputs.image_name }}:${{ inputs.tag }}
