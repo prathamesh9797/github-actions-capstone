@@ -1,124 +1,156 @@
-# GitHub Actions Capstone
+#  GitHub Actions Capstone
 
-A complete CI/CD pipeline built using GitHub Actions, Docker, and scheduled health checks.
+A complete **CI/CD + DevSecOps pipeline** built using GitHub Actions, Docker, and automated security checks.
 
 ---
 
-## Workflow Status
+##  Workflow Status
 
 ![PR Pipeline](https://github.com/prathamesh9797/github-actions-capstone/actions/workflows/pr-pipeline.yml/badge.svg)
-
 ![Main Pipeline](https://github.com/prathamesh9797/github-actions-capstone/actions/workflows/main-pipeline.yml/badge.svg)
-
 ![Health Check](https://github.com/prathamesh9797/github-actions-capstone/actions/workflows/health-check.yml/badge.svg)
 
 ---
 
-## Project Overview
+##  Project Overview
 
-This project is an end-to-end CI/CD pipeline built using GitHub Actions and Docker.
+This project is an end-to-end CI/CD pipeline with integrated DevSecOps practices.
 
 It demonstrates:
-- Reusable workflows for build and test
-- Automated Docker image build and push
-- Deployment workflow using GitHub Actions
-- Scheduled health checks using cron jobs
+
+- CI pipeline using reusable workflows  
+- Automated testing using pytest  
+- Docker image build and push  
+- Deployment workflow using GitHub Actions  
+- Scheduled health checks using cron jobs  
+- Security checks integrated into the pipeline (DevSecOps)  
 
 The application is a simple Flask API with a `/health` endpoint used to validate deployments.
 
-
 ---
 
-##  Pipeline Flow
+## Pipeline Flow
 
 ### Pull Request
 PR opened  
 → Build & Test  
-→ PR checks pass 
+→ Dependency Vulnerability Check  
+→ PR checks pass / fail  
+
+---
 
 ### Main Branch
 Merge to main  
 → Build & Test  
-→ Docker Build & Push  
-→ Deploy 
+→ Docker Build  
+→ Trivy Security Scan 
+→ Docker Push  
+→ Deploy  
+
+---
 
 ### Scheduled Job
 Every 12 hours  
 → Pull Docker image  
 → Run container  
 → Health check  
-→ Report generated 
+→ Report generated  
 
 ---
 
-## Run the Project Locally
+##  Run the Project Locally
 
 ### 1. Clone the Repository
-bash
-git clone https://github.com/prathamesh9797/github-actions-capstone.git
+git clone https://github.com/prathamesh9797/github-actions-capstone.git  
+cd github-actions-capstone  
 
-cd github-actions-capstone
+---
 
-### 2. Create virtual environment
-python -m venv venv
+### 2. Create Virtual Environment
+python -m venv venv  
+source venv/bin/activate   # Linux/Mac  
 
-source venv/bin/activate   # Linux/Mac
+OR  
 
-OR
+venv\Scripts\activate      # Windows  
 
-venv\Scripts\activate      # Windows
+---
 
-### 3. Install dependencies
+### 3. Install Dependencies
+pip install -r requirements.txt  
 
-pip install -r requirements.txt
+---
 
 ### 4. Run the Application
+python app/app.py  
 
-python app/app.py
+---
 
 ### 5. Test the App
 
-Open in Browser
+Open in browser:  
+http://localhost:5000/health  
 
-http://localhost:5000/health
+Expected response:  
+{"status": "ok"}  
 
-Expected Response
+---
 
-{"status": "ok"}
-
-## Run With Docker
+##  Run With Docker
 
 ### Build Image
-
-docker build -t myapp .
+docker build -t myapp .  
 
 ### Run Container
+docker run -p 5000:5000 myapp  
 
-docker run -p 5000:5000 myapp
-
-### Test 
-http://localhost:5000/health
-
----
-
-## How CI/CD Workflow Works
- Pull Requests trigger **build and test only**
-- Push to `main` triggers:
-  - Build & Test
-  - Docker Build & Push
-  - Deployment
-- A scheduled workflow runs every 12 hours to:
-  - Pull the latest image
-  - Run the container
-  - Perform a health check
-  - Generate a report
+### Test
+http://localhost:5000/health  
 
 ---
 
-##  Future Improvements
+##  How CI/CD Workflow Works
 
-- Slack notifications on failure
-- Multi-environment deployment (dev/staging/prod)
-- Rollback strategy
-- Kubernetes deployment
+### Pull Requests
+- Trigger build and test pipeline  
+- Run dependency vulnerability scan  
+- Block PR if critical issues are found  
 
+---
+
+### Push to Main
+- Build & test application  
+- Build Docker image  
+- Scan image using Trivy 
+- Push image to Docker Hub  
+- Deploy application  
+
+---
+
+### Security (DevSecOps)
+- Dependency review checks vulnerable packages  
+- Trivy scans Docker image for vulnerabilities  
+- Secret scanning prevents leaks  
+- Least privilege permissions applied  
+
+---
+
+### Scheduled Workflow
+- Runs every 12 hours  
+- Pulls latest Docker image  
+- Runs container  
+- Performs health check  
+- Generates report  
+
+---
+
+## Future Improvements
+
+- Slack notifications on failure  
+- Multi-environment deployment (dev/staging/prod)  
+- Rollback strategy  
+- Kubernetes deployment  
+
+![images](images/build.png)
+
+![images](images/review.png)
